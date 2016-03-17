@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from forms import BookmarkForm
 from flask_sqlalchemy import SQLAlchemy
 import os
+import models
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -10,11 +11,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "X\xc9i\xef\xf3'\x8a\xc0\x9d)~\xbbf\x89\xdd,C\x90[\xfe\xa41\xe3\xfd"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'thermos.db')
 db = SQLAlchemy(app)
-
-import models
-
-def new_bookmarks(num):
-    return []
 
 
 @app.route('/')
@@ -26,7 +22,7 @@ def index():
                            text="Text passed from view to template")
 
 
-@app.route('/add', methods = ['GET', 'POST'])
+@app.route('/add', methods=['GET', 'POST'])
 def add():
     form = BookmarkForm()
     if form.validate_on_submit():
