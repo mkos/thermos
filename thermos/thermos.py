@@ -11,25 +11,20 @@ app.config['SECRET_KEY'] = "X\xc9i\xef\xf3'\x8a\xc0\x9d)~\xbbf\x89\xdd,C\x90[\xf
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'thermos.db')
 db = SQLAlchemy(app)
 
-bookmarks = []
-
-def store_bookmark(url, description):
-    bookmarks.append(dict(url = url,
-                          description = description,
-                          user = "mkos",
-                          date = datetime.utcnow()
-    ))
+import models
 
 def new_bookmarks(num):
-    return sorted(bookmarks, key = lambda bm: bm['date'], reverse = True)[:num]
+    return []
+
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html',
-                           new_bookmarks = new_bookmarks(5),
+                           new_bookmarks=models.Bookmark.newest(5),
                            title="Title passed from view to template",
                            text="Text passed from view to template")
+
 
 @app.route('/add', methods = ['GET', 'POST'])
 def add():
@@ -37,15 +32,21 @@ def add():
     if form.validate_on_submit():
         url = form.url.data
         description = form.description.data
-        store_bookmark(url, description)
+
+        bm = models.Bookmark(url=url, description=description)
+        db.session.add(bm)
+        db.session.commit()
+
         flash('stored bookmark: {}'.format(description))
         return redirect(url_for('index'))
 
     return render_template('add.html', form=form)
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
 
 @app.errorhandler(500)
 def server_error(e):
