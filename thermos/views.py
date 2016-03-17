@@ -1,28 +1,17 @@
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash
 from forms import BookmarkForm
-from flask_sqlalchemy import SQLAlchemy
-import os
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = "X\xc9i\xef\xf3'\x8a\xc0\x9d)~\xbbf\x89\xdd,C\x90[\xfe\xa41\xe3\xfd"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'thermos.db')
-db = SQLAlchemy(app)
-
-import models
-
+from thermos import app, db
+from models import User, Bookmark
 
 # Fake login for now
 def logged_in_user():
-    return models.User.query.filter_by(username='adam').first()
+    return User.query.filter_by(username='adam').first()
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html',
-                           new_bookmarks=models.Bookmark.newest(5),
+                           new_bookmarks=Bookmark.newest(5),
                            title="Title passed from view to template",
                            text="Text passed from view to template")
 
@@ -34,7 +23,7 @@ def add():
         url = form.url.data
         description = form.description.data
 
-        bm = models.Bookmark(user=logged_in_user(), url=url, description=description)
+        bm = Bookmark(user=logged_in_user(), url=url, description=description)
         db.session.add(bm)
         db.session.commit()
 
