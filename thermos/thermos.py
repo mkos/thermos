@@ -14,6 +14,10 @@ db = SQLAlchemy(app)
 import models
 
 
+# Fake login for now
+def logged_in_user():
+    return models.User.query.filter_by(username='adam').first()
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -30,7 +34,7 @@ def add():
         url = form.url.data
         description = form.description.data
 
-        bm = models.Bookmark(url=url, description=description)
+        bm = models.Bookmark(user=logged_in_user(), url=url, description=description)
         db.session.add(bm)
         db.session.commit()
 
@@ -48,6 +52,3 @@ def page_not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
