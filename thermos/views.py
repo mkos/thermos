@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from forms import BookmarkForm, LoginForm
 from thermos import app, db, login_manager
 from models import User, Bookmark
-from flask_login import login_required, login_user
+from flask_login import login_required, login_user, logout_user, current_user
 
 
 @login_manager.user_loader
@@ -27,7 +27,7 @@ def add():
         url = form.url.data
         description = form.description.data
 
-        bm = Bookmark(user=logged_in_user(), url=url, description=description)
+        bm = Bookmark(user=current_user, url=url, description=description)
         db.session.add(bm)
         db.session.commit()
 
@@ -55,6 +55,12 @@ def login():
             return redirect(request.args.get('next') or url_for('index'))
         flash('Incorrect username or password')
     return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(404)
