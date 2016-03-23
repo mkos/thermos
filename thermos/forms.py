@@ -8,6 +8,8 @@ from models import User
 class BookmarkForm(Form):
     url = URLField('The URL for your bookmark', validators=[DataRequired(), url()])
     description = StringField('Add an optional description')
+    tags = StringField('Tags', validators=[Regexp(r'^[a-zA-Z0-9, ]*$',
+                                                  message='Tags can only contain letters and numbers')])
 
     def validate(self):
 
@@ -23,6 +25,12 @@ class BookmarkForm(Form):
         # if description field is empty, fill it with url string
         if not self.description.data:
             self.description.data = self.url.data
+
+        # filter out empty and duplicate tag names
+        stripped = [t.strip() for t in self.tags.data.split(',')]
+        not_empty = [tag for tag in stripped if tag]
+        tagset = set(not_empty)
+        self.tags.data = ','.join(tagset)
 
         return True
 

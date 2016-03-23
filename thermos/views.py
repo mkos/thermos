@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, abort
 from forms import BookmarkForm, LoginForm, SignupForm
 from thermos import app, db, login_manager
-from models import User, Bookmark
+from models import User, Bookmark, Tag
 from flask_login import login_required, login_user, logout_user, current_user
 
 
@@ -26,8 +26,9 @@ def add():
     if form.validate_on_submit():
         url = form.url.data
         description = form.description.data
+        tags = form.tags.data
 
-        bm = Bookmark(user=current_user, url=url, description=description)
+        bm = Bookmark(user=current_user, url=url, description=description, tags=tags)
         db.session.add(bm)
         db.session.commit()
 
