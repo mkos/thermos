@@ -86,12 +86,18 @@ def signup():
     if form.validate_on_submit():
         user = User(email=form.email.data,
                     username=form.username.data,
-                    password =form.password.data)
+                    password=form.password.data)
         db.session.add(user)
         db.session.commit()
         flash("Welcome, {}! Please login.".format(user.username))
         return redirect(url_for('login'))
     return render_template("signup.html", form=form)
+
+
+@app.route('/tag/<name>')
+def tag(name):
+    tag = Tag.query.filter_by(name=name).first_or_404()
+    return render_template('tag.html', tag=tag)
 
 
 @app.errorhandler(404)
@@ -102,6 +108,7 @@ def page_not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
+
 
 @app.context_processor
 def inject_tags():
