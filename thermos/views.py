@@ -102,3 +102,7 @@ def page_not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
+
+@app.context_processor
+def inject_tags():
+    return dict(all_tags=Tag.all)
