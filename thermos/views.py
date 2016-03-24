@@ -14,9 +14,7 @@ def load_user(user_id):
 @app.route('/index')
 def index():
     return render_template('index.html',
-                           new_bookmarks=Bookmark.newest(5),
-                           title="Title passed from view to template",
-                           text="Text passed from view to template")
+                           new_bookmarks=Bookmark.newest(5))
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -51,6 +49,22 @@ def edit_bookmark(bookmark_id):
         flash("Stored '{}'".format(bookmark.description))
         return redirect(url_for('user', username=current_user.username))
     return render_template('bookmark_form.html', form=form, title="Edit bookmark")
+
+
+@app.route('/delete/<int:bookmark_id>', methods=['GET', 'POST'])
+@login_required
+def delete_bookmark(bookmark_id):
+    bookmark = Bookmark.query.get_or_404(bookmark_id)
+    if current_user != bookmark.user:
+        abort(403)
+    if request.method == "POST":
+        db.session.delete(bookmark)
+        db.session.commit()
+        flash("Deleted '{}'".format(bookmark.description))
+        return redirect(url_for('user', username=current_user.username))
+    else:
+        flash("Please confirm deleting the bookmark.")
+    return render_template('confirm_delete.html', bookmark=bookmark, nolinks=True)
 
 
 @app.route('/user/<username>')
