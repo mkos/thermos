@@ -11,3 +11,4 @@ Flask-Script>=2.0.5
 flask-login>=0.3.2
 Flask-Moment>=0.5.1
 Flask-Migrate>=1.8.0
+Flask-DebugToolbar>=0.10.0
