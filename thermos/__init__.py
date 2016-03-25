@@ -32,5 +32,11 @@ moment = Moment(app)
 from .auth import auth as auth_blueprint
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+from .bookmarks import bookmarks as bookmarks_blueprint
+app.register_blueprint(bookmarks_blueprint, url_prefix='/bookmarks')
+
+from .main import main as main_blueprint
+app.register_blueprint(main_blueprint, url_prefix='/')
+
 import models
 import views
